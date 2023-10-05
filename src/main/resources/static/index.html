@@ -1,7 +1,22 @@
-<html>
- <head>
- </head>
- <body>
-   <h1>Hello Ktor!</h1>
- </body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>lastminuteresy</title>
+</head>
+
+<body>
+<h1 style="text-align: center;">Coming soon</h1>
+<script type="module">
+    // Importing WASM as a JS module requires us to call an init function provided by the default export.
+    // This is planned to be changed in the future.
+    import { default as wasm, greet } from "../pkg/lastminuteresy_web.js";
+
+    wasm().then((module) => {
+        // The boiler plate project comes with a `greet` function that calls:
+        // `alert("Hello, hello-wasm!");`
+        greet();
+    });
+</script>
+</body>
 </html>
