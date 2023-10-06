@@ -9,13 +9,34 @@ import kotlin.test.*
 
 class ApplicationTest {
     @Test
-    fun testRoot() = testApplication {
+    fun testMainPage() = testApplication {
         application {
             configureRouting()
         }
-        client.get("/").apply {
+        client.get("/index.html").apply {
             assertEquals(HttpStatusCode.OK, status)
-            assertEquals("Hello World!", bodyAsText())
+        }
+    }
+
+    @Test
+    fun testDemoRestaurantBookingPage() = testApplication {
+        application {
+            configureRouting()
+        }
+        client.get("/demorestaurant/bookTable.html").apply {
+            assertEquals(HttpStatusCode.OK, status)
+            assertTrue(bodyAsText().contains("Number of free tables: 0"))
+        }
+    }
+
+    @Test
+    fun testDemoRestaurantBookRequest() = testApplication {
+        application {
+            configureRouting()
+        }
+        client.get("/demorestaurant/book").apply {
+            assertEquals(HttpStatusCode.OK, status)
+            assertTrue(bodyAsText().contains("Table booked!"))
         }
     }
 }
