@@ -8,12 +8,11 @@ import io.ktor.server.http.content.*
 import io.ktor.server.routing.*
 import kotlinx.html.*
 
-fun Application.configureRouting() {
+fun Application.configureRouting(tableService: TableServiceImpl) {
     routing {
         get("/demorestaurant/bookTable.html") {
             call.respondHtml(HttpStatusCode.OK) {
-                // TODO: Fixa noClassdefError
-                //val freeTables = TableServiceImpl().numberOfFreeTables;
+                val freeTables = tableService.getNumberOfFreeTables()
                 head {
                     title {
                         +"lastminuteresy"
@@ -24,8 +23,8 @@ fun Application.configureRouting() {
                         +"Book a table at chez Meredith"
                     }
                     strong {
-                        +"Number of free tables: 0"
-                        //+freeTables.toString()
+                        +"Number of free tables: "
+                        +freeTables.toString()
                     }
                     br { }
                     br { }
@@ -35,6 +34,7 @@ fun Application.configureRouting() {
         }
         get("/demorestaurant/book") {
             call.respondHtml(HttpStatusCode.OK) {
+                tableService.bookTable()
                 head {
                     title {
                         +"lastminuteresy"
@@ -44,6 +44,27 @@ fun Application.configureRouting() {
                     strong {
                         +"Table booked!"
                     }
+                    br { }
+                    br { }
+                    a(href = "/demorestaurant/bookTable.html") { +"Return to table booking" }
+                }
+            }
+        }
+        get("/demorestaurant/admin/unbook") {
+            call.respondHtml(HttpStatusCode.OK) {
+                tableService.unbookTable()
+                head {
+                    title {
+                        +"lastminuteresy"
+                    }
+                }
+                body {
+                    strong {
+                        +"Table unbooked!"
+                    }
+                    br { }
+                    br { }
+                    a(href = "/demorestaurant/bookTable.html") { +"Return to table booking" }
                 }
             }
         }

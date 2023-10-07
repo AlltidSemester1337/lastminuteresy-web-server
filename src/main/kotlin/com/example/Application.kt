@@ -1,5 +1,6 @@
 package com.example
 
+import com.example.adapter.http.TableServiceImpl
 import com.example.plugins.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
@@ -11,5 +12,5 @@ fun main() {
 }
 
 fun Application.module() {
-    configureRouting()
+    configureRouting(TableServiceImpl())
 }

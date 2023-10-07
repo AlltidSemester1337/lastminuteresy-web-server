@@ -9,3 +9,7 @@ Run locally:
 ./gradlew publishImageToLocalRegistry
 docker run -p 8080:8080 <image_name>
 </p>
+
+<p>
+Also serves demo restaurant booking page at /demorestaurant/bookTable.html and GET /demorestaurant/admin/unbook
+</p>
