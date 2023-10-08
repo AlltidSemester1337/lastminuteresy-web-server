@@ -1,0 +1,15 @@
+{
+  "serviceName": "lastminutetableresy-web",
+  "containers": {
+    "lastminutetableresy-web-container": {
+      "image": ":lastminutetableresy-web.latest.1",
+      "ports": {
+        "8080": "HTTP"
+      }
+    }
+  },
+  "publicEndpoint": {
+    "containerName": "lastminutetableresy-web-container",
+    "containerPort": 8080
+  }
+}
