@@ -2,7 +2,7 @@
 
 <p>
 Web server for lastminute-resy website content.
-Currently deployed to <a>https://lastminutetableresy-web.5u8ft02gsv7ds.eu-west-3.cs.amazonlightsail.com/index.html</a> 
+Currently deployed to <a>TODO</a> 
 
 Build docker image: ./gradlew buildImage
 Run locally:
@@ -13,46 +13,25 @@ docker run -p 8080:8080 <image_name>
 
 <p>
 Also serves demo restaurant booking page at 
-<a>https://lastminutetableresy-web.5u8ft02gsv7ds.eu-west-3.cs.amazonlightsail.com/demorestaurant/bookTable.html</a> and 
-GET <a>https://lastminutetableresy-web.5u8ft02gsv7ds.eu-west-3.cs.amazonlightsail.com/demorestaurant/admin/unbook</a>
+<a>TODO</a> and 
+GET <a>TODO</a>
 </p>
 
 <h2>Deploy process</h2>
-<p>prerequisties: docker image (see above) and aws account / credentials configured</p>
+<p>prerequisties: docker image for linux/arm64 (see above or use Dockerfile) and gcloud / credentials configured</p>
 <ul>
-<li>confirm container service ready: <br>
-aws lightsail get-container-services  \
-    --region eu-west-3                \
-    --service-name lastminutetableresy-web \
-    --query "containerServices[].state"</li>
-<li>push image:<br>
-aws lightsail push-container-image    \
-    --region eu-west-3                \
-    --service-name lastminutetableresy-web \
-    --label latest                    \
-    --image ktor-docker-image:latest</li>
-<li>(optional) get new image(?) name<br>
-aws lightsail get-container-images    \
-    --region eu-west-3                \
-    --service-name lastminutetableresy-web</li>
-<li>Update deploy.json file with image name</li>
+<li>push artifact (image) <br>
+docker push europe-west1-docker.pkg.dev/${PROJECT_ID}/lastminuteresy/web:tag</li>
+<li>(optional) credentials for cluster<br>
+gcloud container clusters get-credentials hello-cluster --region europe-west1</li>
 <li><strong>create deployment for new image</strong><br>
-aws lightsail create-container-service-deployment \
-    --region eu-west-3                            \
-    --cli-input-json "deploy.json_full_file_path"</li>
-<li>get deployment state (takes up to 3 min):<br>
-aws lightsail get-container-services      \
-    --region eu-west-3                    \
-    --query "containerServices[].nextDeployment.state"
-<br>alternatively<br>
-aws lightsail get-container-services      \
-    --region eu-west-3                    \
-    --query "containerServices[].currentDeployment.state"</li>
-<li>get deployed container url<br>
-aws lightsail get-container-services        \
-    --region eu-west-3                      \
-    --query "containerServices[].url"</li>
+kubectl create deployment lasttableresy-web --image=europe-west1-docker.pkg.dev/${PROJECT_ID}/lastminuteresy/web:tag</li>
+<br>alternative rolling update only <br>
+kubectl set image deployment/lasttableresy-web web=europe-west1-docker.pkg.dev/${PROJECT_ID}/lastminuteresy/web:new-tag
+<li>set replicas (if needed)<br>
+kubectl scale deployment lastminuteresy-web --replicas=3
+<br>autoscaling (optional)<br>
+kubectl autoscale deployment lastminuteresy-web --cpu-percent=80 --min=1 --max=5
 <li>???</li>
 <li>Profit</li>
-
 </ul>
