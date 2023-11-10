@@ -2,7 +2,7 @@
 
 <p>
 Web server for lastminute-resy website content.
-Currently deployed to <a>TODO</a> 
+Currently deployed to <a>http://35.233.70.88:8080/index.html</a> 
 
 Build docker image: ./gradlew buildImage
 Run locally:
@@ -13,8 +13,7 @@ docker run -p 8080:8080 <image_name>
 
 <p>
 Also serves demo restaurant booking page at 
-<a>TODO</a> and 
-GET <a>TODO</a>
+<a>http://35.233.70.88:8080/demorestaurant/bookTable.html</a>
 </p>
 
 <h2>Deploy process</h2>
