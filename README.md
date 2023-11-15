@@ -34,3 +34,12 @@ kubectl autoscale deployment lastminuteresy-web --cpu-percent=80 --min=1 --max=5
 <li>???</li>
 <li>Profit</li>
 </ul>
+
+<h1>System architecture and new booking request flow sequence diagram</h1>
+<br>
+<p>(should be moved elsewhere but for the time being here)</p>
+<br>
+<h2>Architecture</h2>
+<img src="lastminuteresy_architecture_1.0.drawio.png">
+<h2>New booking request flow</h2>
+<img src="lastminuteresy_1.0.png">
