@@ -6,6 +6,7 @@ val logback_version: String by project
 plugins {
     kotlin("jvm") version "1.9.10"
     id("io.ktor.plugin") version "2.3.4"
+    kotlin("plugin.serialization") version "1.9.20"
 }
 
 group = "com.example"
@@ -29,6 +30,12 @@ repositories {
 }
 
 dependencies {
+    implementation("io.ktor:ktor-client-core:1.7.5")
+    implementation("io.ktor:ktor-client-apache:1.7.5")
+    implementation("io.ktor:ktor-client-json:1.7.5")
+    implementation("io.ktor:ktor-client-serialization:1.7.5")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.1")
     implementation("io.ktor:ktor-server-core-jvm")
     implementation("io.ktor:ktor-server-html-builder")
     implementation("io.ktor:ktor-server-host-common-jvm")

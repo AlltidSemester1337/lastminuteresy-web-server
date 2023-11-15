@@ -1,12 +1,37 @@
 package com.example.plugins
 
 import com.example.adapter.http.TableServiceImpl
+import com.example.model.Booking
+import io.ktor.client.*
+import io.ktor.client.call.*
+import io.ktor.client.engine.apache.*
+import io.ktor.client.plugins.json.*
+import io.ktor.client.plugins.kotlinx.serializer.*
+import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.html.*
-import io.ktor.server.http.content.*
 import io.ktor.server.routing.*
+import kotlinx.coroutines.runBlocking
 import kotlinx.html.*
+import kotlinx.serialization.json.Json
+
+fun getAvailableBookings(): List<Booking> {
+    val client = HttpClient(Apache) {
+        install(JsonPlugin) {
+            serializer = KotlinxSerializer(kotlinx.serialization.json.Json {
+                ignoreUnknownKeys = true
+            })
+        }
+    }
+    var result: List<Booking>
+    runBlocking {
+        result = client.get(System.getenv("BOOKINGS_URL")) {
+            contentType(ContentType.Application.Json)
+        }.body()
+    }
+    return result
+}
 
 fun Application.configureRouting(tableService: TableServiceImpl) {
     routing {
@@ -68,8 +93,26 @@ fun Application.configureRouting(tableService: TableServiceImpl) {
                 }
             }
         }
-        static("/") {
-            resources("static")
+        get("/") {
+            call.respondHtml(HttpStatusCode.OK) {
+                head {
+                    title {
+                        +"lastminuteresy"
+                    }
+                }
+                body {
+                    h1 {
+                        +"Available restaurant table bookings"
+                    }
+                    val bookings = getAvailableBookings()
+                    bookings.forEach {
+                        strong {
+                            +it.toString()
+                        }
+                        br{}
+                    }
+                }
+            }
         }
     }
 }
