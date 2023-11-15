@@ -26,6 +26,7 @@ fun getAvailableBookings(): List<Booking> {
     }
     var result: List<Booking>
     runBlocking {
+        // TODO: This needs to be inserted into DockerFile or container variables before deploy
         result = client.get(System.getenv("BOOKINGS_URL")) {
             contentType(ContentType.Application.Json)
         }.body()
