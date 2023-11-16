@@ -2,6 +2,7 @@ package com.example.plugins
 
 import com.example.adapter.http.TableServiceImpl
 import com.example.model.Booking
+import com.example.model.Integration
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.apache.*
@@ -11,23 +12,43 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.html.*
+import io.ktor.server.request.*
 import io.ktor.server.routing.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.html.*
 import kotlinx.serialization.json.Json
 
-fun getAvailableBookings(): List<Booking> {
-    val client = HttpClient(Apache) {
+fun getHttpClient(): HttpClient {
+    return HttpClient(Apache) {
         install(JsonPlugin) {
             serializer = KotlinxSerializer(kotlinx.serialization.json.Json {
                 ignoreUnknownKeys = true
             })
         }
     }
+}
+
+
+fun getAvailableBookings(): List<Booking> {
+    val client = getHttpClient()
     var result: List<Booking>
     runBlocking {
         // TODO: This needs to be inserted into DockerFile or container variables before deploy
-        result = client.get(System.getenv("BOOKINGS_URL")) {
+        // example TABLE_SERVICE_IP_PORT=localhost:8080
+        result = client.get("http://" + System.getenv("TABLE_SERVICE_IP_PORT") + "/bookings/free/all") {
+            contentType(ContentType.Application.Json)
+        }.body()
+    }
+    return result
+}
+
+fun getAvailableIntegrations(): List<Integration> {
+    val client = getHttpClient()
+    var result: List<Integration>
+    runBlocking {
+        // TODO: This needs to be inserted into DockerFile or container variables before deploy
+        // example TABLE_SERVICE_IP_PORT=localhost:8080
+        result = client.get("http://" + System.getenv("TABLE_SERVICE_IP_PORT") + "/integrations") {
             contentType(ContentType.Application.Json)
         }.body()
     }
@@ -110,10 +131,89 @@ fun Application.configureRouting(tableService: TableServiceImpl) {
                         strong {
                             +it.toString()
                         }
-                        br{}
+                        br {}
+                    }
+                }
+            }
+        }
+        get("/admin/book") {
+            call.respondHtml(HttpStatusCode.OK) {
+                head {
+                    title {
+                        +"lastminuteresy"
+                    }
+                }
+                body {
+                    h1 {
+                        +"Request new booking"
+                    }
+                    val integrations = getAvailableIntegrations()
+                    integrations.forEach {
+                        strong {
+                            +it.toString()
+                        }
+                        br {}
+                    }
+                    form(
+                        action = "/admin/book",
+                        encType = FormEncType.applicationXWwwFormUrlEncoded,
+                        method = FormMethod.post
+                    ) {
+                        p {
+                            +"Integration ID:"
+                            numberInput(name = "integration_id")
+                        }
+                        p {
+                            +"Time:"
+                            dateTimeInput(name = "time")
+                        }
+                        p {
+                            submitInput { value = "Request booking" }
+                        }
+                    }
+                }
+            }
+        }
+        post("/admin/book") {
+            val formParameters = call.receiveParameters()
+            val integrationId = formParameters["integration_id"]
+            val time = formParameters["time"]
+            val response = requestNewBooking(integrationId, time)
+            call.respondHtml(HttpStatusCode.OK) {
+                head {
+                    title {
+                        +"lastminuteresy"
+                    }
+                }
+                body {
+                    h1 {
+                        +"Request new booking"
+                    }
+                    if (response.getStatusCode() == 200) {
+                        strong { +"Booking requested successfully" }
+                        a(href = "/") { +"Check available bookings" }
+                    } else {
+                        strong { +"Booking request failed with cause:" }
+                        p { +response.toString() }
+                        a(href = "/admin/book") { +"Try again" }
                     }
                 }
             }
         }
     }
+}
+
+fun requestNewBooking(integrationId: String?, time: String?): Any {
+    val client = getHttpClient()
+    // TODO: Implement!
+    //var result: List<Integration>
+    //runBlocking {
+    // TODO: This needs to be inserted into DockerFile or container variables before deploy
+    // example TABLE_SERVICE_IP_PORT=localhost:8080
+    //    result = client.get("http://" + System.getenv("TABLE_SERVICE_IP_PORT") + "/integrations") {
+    //        contentType(ContentType.Application.Json)
+    //    }.body()
+    //}
+    //return result
+    return 0
 }
