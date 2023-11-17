@@ -22,6 +22,8 @@ application {
 ktor{
     docker{
         jreVersion.set(JavaVersion.VERSION_18)
+        localImageName.set("europe-west1-docker.pkg.dev/sapient-bucksaw-401016/lastminuteresy/web")
+        imageTag.set("v1.3")
     }
 }
 

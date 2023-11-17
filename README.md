@@ -24,9 +24,9 @@ docker push europe-west1-docker.pkg.dev/${PROJECT_ID}/lastminuteresy/web:tag</li
 <li>(optional) credentials for cluster<br>
 gcloud container clusters get-credentials hello-cluster --region europe-west1</li>
 <li><strong>create deployment for new image</strong><br>
-kubectl create deployment lasttableresy-web --image=europe-west1-docker.pkg.dev/${PROJECT_ID}/lastminuteresy/web:tag</li>
+kubectl create deployment lastminuteresy-web --image=europe-west1-docker.pkg.dev/${PROJECT_ID}/lastminuteresy/web:tag</li>
 <br>alternative rolling update only <br>
-kubectl set image deployment/lasttableresy-web web=europe-west1-docker.pkg.dev/${PROJECT_ID}/lastminuteresy/web:new-tag
+kubectl set image deployment/lastminuteresy-web web=europe-west1-docker.pkg.dev/${PROJECT_ID}/lastminuteresy/web:new-tag
 <li>set replicas (if needed)<br>
 kubectl scale deployment lastminuteresy-web --replicas=3
 <br>autoscaling (optional)<br>
