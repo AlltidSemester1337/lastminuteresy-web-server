@@ -2,6 +2,7 @@ package com.example.plugins
 
 import com.example.adapter.http.TableServiceImpl
 import com.example.model.Booking
+import com.example.model.BookingRequest
 import com.example.model.Integration
 import io.ktor.client.*
 import io.ktor.client.call.*
@@ -9,6 +10,7 @@ import io.ktor.client.engine.apache.*
 import io.ktor.client.plugins.json.*
 import io.ktor.client.plugins.kotlinx.serializer.*
 import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.html.*
@@ -16,7 +18,9 @@ import io.ktor.server.request.*
 import io.ktor.server.routing.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.html.*
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.internal.writeJson
 
 fun getHttpClient(): HttpClient {
     return HttpClient(Apache) {
@@ -176,9 +180,9 @@ fun Application.configureRouting(tableService: TableServiceImpl) {
         }
         post("/admin/book") {
             val formParameters = call.receiveParameters()
-            val integrationId = formParameters["integration_id"]
+            val integrationId = formParameters["integration_id"]!!.toInt()
             val time = formParameters["time"]
-            val response = requestNewBooking(integrationId, time)
+            val response = requestNewBooking(integrationId, time!!)
             call.respondHtml(HttpStatusCode.OK) {
                 head {
                     title {
@@ -189,12 +193,19 @@ fun Application.configureRouting(tableService: TableServiceImpl) {
                     h1 {
                         +"Request new booking"
                     }
-                    if (response.getStatusCode() == 200) {
+                    if (response.status.value == 200) {
                         strong { +"Booking requested successfully" }
                         a(href = "/") { +"Check available bookings" }
                     } else {
                         strong { +"Booking request failed with cause:" }
-                        p { +response.toString() }
+                        p {
+                            +response.toString()
+                            var temp: String
+                            runBlocking {
+                                temp = response.body()
+                            }
+                            +temp
+                        }
                         a(href = "/admin/book") { +"Try again" }
                     }
                 }
@@ -203,17 +214,14 @@ fun Application.configureRouting(tableService: TableServiceImpl) {
     }
 }
 
-fun requestNewBooking(integrationId: String?, time: String?): Any {
+fun requestNewBooking(integrationId: Int, time: String): HttpResponse {
     val client = getHttpClient()
-    // TODO: Implement!
-    //var result: List<Integration>
-    //runBlocking {
-    // TODO: This needs to be inserted into DockerFile or container variables before deploy
-    // example TABLE_SERVICE_IP_PORT=localhost:8080
-    //    result = client.get("http://" + System.getenv("TABLE_SERVICE_IP_PORT") + "/integrations") {
-    //        contentType(ContentType.Application.Json)
-    //    }.body()
-    //}
-    //return result
-    return 0
+    return runBlocking {
+        // TODO: This needs to be inserted into DockerFile or container variables before deploy
+        // example TABLE_SERVICE_IP_PORT=localhost:8080
+        client.post("http://" + System.getenv("TABLE_SERVICE_IP_PORT") + "/bookings/request") {
+            contentType(ContentType.Application.Json)
+            setBody(Json.encodeToString(BookingRequest(integrationId, time)))
+        }
+    }
 }
