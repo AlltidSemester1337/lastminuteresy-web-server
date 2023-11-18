@@ -2,7 +2,7 @@
 
 <p>
 Web server for lastminute-resy website content.
-Currently deployed to <a>http://35.233.70.88:8080/index.html</a> 
+Currently deployed to <a>http://35.233.70.88:8080</a> with possibility to request new booking at <a>http://35.233.70.88:8080/admin/book</a>
 
 Build docker image: ./gradlew buildImage
 Run locally:
