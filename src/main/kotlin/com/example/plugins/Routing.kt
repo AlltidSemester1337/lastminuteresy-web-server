@@ -56,7 +56,7 @@ fun getAvailableIntegrations(): List<Integration> {
             contentType(ContentType.Application.Json)
         }.body()
     }
-    return result
+    return result.filter { it.restaurant == "demorestaurant" }
 }
 
 fun Application.configureRouting(tableService: TableServiceImpl) {
@@ -168,8 +168,18 @@ fun Application.configureRouting(tableService: TableServiceImpl) {
                             numberInput(name = "integration_id")
                         }
                         p {
+                            +"Number of people:"
+                            numberInput(name = "num_persons")
+                        }
+                        p {
                             +"Time:"
                             dateTimeInput(name = "time")
+                        }
+                        p {
+                            +"Extra parameters (name=value on each line, example email=test@test.com):"
+                            textArea {
+                                name = "extra_parameters"
+                            }
                         }
                         p {
                             submitInput { value = "Request booking" }
@@ -181,8 +191,10 @@ fun Application.configureRouting(tableService: TableServiceImpl) {
         post("/admin/book") {
             val formParameters = call.receiveParameters()
             val integrationId = formParameters["integration_id"]!!.toInt()
+            val numPersons = formParameters["num_persons"]!!.toInt()
             val time = formParameters["time"]
-            val response = requestNewBooking(integrationId, time!!)
+            val extra_parameters = parseExtraParametersString(formParameters["extra_parameters"]!!)
+            val response = requestNewBooking(integrationId, numPersons, time!!, extra_parameters)
             call.respondHtml(HttpStatusCode.OK) {
                 head {
                     title {
@@ -214,14 +226,28 @@ fun Application.configureRouting(tableService: TableServiceImpl) {
     }
 }
 
-fun requestNewBooking(integrationId: Int, time: String): HttpResponse {
+fun parseExtraParametersString(extraParametersString: String): Map<String, String> {
+    val result = mutableMapOf<String, String>()
+    extraParametersString.lines().forEach {
+        val keyValuePair = it.split("=")
+        result[keyValuePair[0]] = keyValuePair[1]
+    }
+    return result
+}
+
+fun requestNewBooking(
+    integrationId: Int,
+    numPersons: Int,
+    time: String,
+    extraParameters: Map<String, String>
+): HttpResponse {
     val client = getHttpClient()
     return runBlocking {
         // TODO: This needs to be inserted into DockerFile or container variables before deploy
         // example TABLE_SERVICE_IP_PORT=localhost:8080
         client.post("http://" + System.getenv("TABLE_SERVICE_IP_PORT") + "/bookings/request") {
             contentType(ContentType.Application.Json)
-            setBody(Json.encodeToString(BookingRequest(integrationId, time)))
+            setBody(Json.encodeToString(BookingRequest(integrationId, numPersons, time, extraParameters)))
         }
     }
 }
