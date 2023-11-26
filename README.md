@@ -43,3 +43,5 @@ kubectl autoscale deployment lastminuteresy-web --cpu-percent=80 --min=1 --max=5
 <img src="lastminuteresy_architecture_1.0.drawio.png">
 <h2>New booking request flow</h2>
 <img src="lastminuteresy_1.0.png">
+
+![Video](https://AlltidSemester1337.github.io/lastminuteresy-web-server/docs/hantverket_demo_censored.mp4)
